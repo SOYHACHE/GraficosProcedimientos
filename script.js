@@ -21,14 +21,14 @@ function actualizarTextoResumen(meses, dataCant, dataPlata) {
     }
 
     const totalCant = dataCant.reduce((a, b) => a + b, 0);
-    const maxCant = Math.max(...dataCant);
+    const maxCant = dataCant.length > 0 ? Math.max(...dataCant) : 0;
     const mesMaxCant = meses[dataCant.indexOf(maxCant)] || 'N/A';
 
     const totalPlata = dataPlata.reduce((a, b) => a + b, 0);
-    const maxPlata = Math.max(...dataPlata);
+    const maxPlata = dataPlata.length > 0 ? Math.max(...dataPlata) : 0;
     const mesMaxPlata = meses[dataPlata.indexOf(maxPlata)] || 'N/A';
     
-    const promedioCant = (totalCant / dataCant.length).toFixed(1);
+    const promedioCant = dataCant.length > 0 ? (totalCant / dataCant.length).toFixed(1) : 0;
 
     if (!modoDinero) {
         lista.innerHTML += `<li>Total acumulado del periodo visible: <b>${totalCant} procedimientos</b> realizados.</li>`;
@@ -54,8 +54,8 @@ function renderizar() {
         let valC = inputsC[i].value.trim();
         let valP = inputsP[i].value.trim();
 
-        if (!modoDinero && valC === '') continue;
-        if (modoDinero && valP === '') continue;
+        // Si el campo está vacío, omitimos completamente este mes de los gráficos
+        if (valC === '' && valP === '') continue;
 
         meses.push(selectsMeses[i].value);
         dataCant.push(valC === '' ? 0 : parseInt(valC));
@@ -148,4 +148,3 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('Error al registrar el Service Worker:', err));
     });
 }
-

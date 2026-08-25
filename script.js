@@ -54,7 +54,7 @@ function renderizar() {
         let valC = inputsC[i].value.trim();
         let valP = inputsP[i].value.trim();
 
-        // Si el campo está vacío, omitimos completamente este mes de los gráficos
+        // Si ambos campos están vacíos, omitimos este mes del gráfico
         if (valC === '' && valP === '') continue;
 
         meses.push(selectsMeses[i].value);
@@ -124,7 +124,7 @@ function renderizar() {
     });
 }
 
-// Función para descargar el gráfico actual mediante el botón personalizado
+// Función para descargar el gráfico actual
 function descargarGrafico() {
     const chart = Highcharts.charts.find(c => c && c.renderTo.id === 'chart-container');
     if (chart) {
@@ -137,7 +137,7 @@ function descargarGrafico() {
     }
 }
 
-// Inicialización de la aplicación
+// Inicialización de la aplicación al cargar la página
 window.onload = renderizar;
 
 // Registro del Service Worker para funcionamiento PWA

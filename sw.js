@@ -1,10 +1,14 @@
-const CACHE_NAME = 'dashboard-seguridad-v1';
+const CACHE_NAME = 'dashboard-seguridad-v2';
 const urlsToCache = [
+  './',
   'index.html',
   'styles.css',
   'script.js',
+  'manifest.json',
   'https://code.highcharts.com/highcharts.js',
-  'https://code.highcharts.com/highcharts-3d.js'
+  'https://code.highcharts.com/highcharts-3d.js',
+  'https://code.highcharts.com/modules/exporting.js',
+  'https://code.highcharts.com/modules/export-offline.js'
 ];
 
 // Instalación del Service Worker y guardado en caché
@@ -14,6 +18,7 @@ self.addEventListener('install', event => {
       .then(cache => {
         return cache.addAll(urlsToCache);
       })
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -28,7 +33,7 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 

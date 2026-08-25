@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Seguridad Dinámico</title>
     
-    <!-- Librerías de Highcharts y Highcharts 3D -->
+    <!-- Librerías de Highcharts -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-3d.js"></script>
 
-    <!-- Enlace al archivo CSS externo (si lo guardas separado) -->
+    <!-- Enlace a la hoja de estilos CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,7 +22,7 @@
         
         <!-- Menú para elegir cuántas columnas/meses crear -->
         <div class="selector-columnas">
-            <label for="num-columnas">¿Cuántos periodos/meses deseas mostrar?</label>
+            <label for="num-columnas">¿Cuántos periodos deseas mostrar?</label>
             <select id="num-columnas" onchange="generarCamposDinamicos()">
                 <option value="1">1 mes</option>
                 <option value="2">2 meses</option>
@@ -40,10 +40,10 @@
         </div>
 
         <div style="font-size: 11px; font-weight: bold; color: #4a5568; margin-bottom: 5px;">
-            Ingresa libremente el nombre del mes/etiqueta, su cantidad y el monto:
+            Ingresa libremente el nombre del periodo, su cantidad y el monto:
         </div>
 
-        <!-- Contenedor dinámico de los inputs generados por JS -->
+        <!-- Contenedor dinámico generado por JavaScript -->
         <div id="dinamic-inputs-container"></div>
 
         <div class="btn-update-container">
@@ -57,7 +57,7 @@
         <button id="tab-plata" class="tab-btn" onclick="cambiarModo(true)">Vista: Dinero ($)</button>
     </div>
 
-    <!-- Reporte Final y Gráfico -->
+    <!-- Reporte y Gráfico -->
     <div id="reporte-final">
         <div class="header-reporte">
             <h2>REPORTE MENSUAL DE SEGURIDAD</h2>
@@ -75,7 +75,7 @@
     </div>
 </div>
 
-<!-- Enlace al archivo JavaScript externo (si lo guardas separado) -->
+<!-- Enlace al archivo de lógica JavaScript -->
 <script src="script.js"></script>
 
 </body>

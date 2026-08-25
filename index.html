@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Seguridad Dinámico</title>
     
+    <!-- Librerías de Highcharts, 3D y el módulo de Exportación de Imágenes -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
 
     <style>
         :root {
@@ -161,7 +164,7 @@
             overflow-x: auto;
         }
         #chart-container {
-            height: 400px;
+            height: 420px;
             width: 100%;
             min-width: 320px;
         }
@@ -276,7 +279,6 @@
         </div>
     </div>
 </div>
-
 <script>
     let modoDinero = false;
 
@@ -397,6 +399,26 @@
                     viewDistance: 25
                 },
                 backgroundColor: 'transparent'
+            },
+            // Configuración del botón de exportación de imagen / PDF / CSV
+            exporting: {
+                enabled: true,
+                buttons: {
+                    contextButton: {
+                        menuItemDefinitions: {
+                            downloadPNG: { text: 'Descargar imagen PNG' },
+                            downloadJPEG: { text: 'Descargar imagen JPEG' },
+                            downloadPDF: { text: 'Descargar documento PDF' },
+                            downloadSVG: { text: 'Descargar vector SVG' },
+                            separator: {},
+                            downloadCSV: { text: 'Descargar datos CSV' },
+                            downloadXLS: { text: 'Descargar datos XLS' }
+                        },
+                        menuItems: [
+                            'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'separator', 'downloadCSV', 'downloadXLS'
+                        ]
+                    }
+                }
             },
             title: { text: titulo, style: { fontWeight: 'bold', color: '#000', fontSize: '15px' } },
             xAxis: {

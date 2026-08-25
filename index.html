@@ -3,23 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Seguridad Ejecutiva 3D</title>
+    <title>Dashboard de Seguridad Dinámico</title>
     
-    <!-- Configuración PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1a365d">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Dashboard Seg">
-
-    <!-- Highcharts, componentes 3D y módulos de exportación -->
+    <!-- Librerías de Highcharts y Highcharts 3D -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-3d.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="https://code.highcharts.com/modules/export-offline.js"></script>
 
-    <!-- Enlace al archivo CSS externo -->
-    <link rel="stylesheet" href="styles.css">
+    <!-- Enlace al archivo CSS externo (si lo guardas separado) -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -27,66 +18,46 @@
     <h1>Dashboard de Seguridad</h1>
 
     <div class="card-config">
-        <div class="section-title">1. Configuración de Meses y Cantidad de Procedimientos</div>
-        <div class="grid-inputs" id="inputs-cant">
-            <div class="input-group">
-                <select class="mes-select">
-                    <option value="Enero" selected>ENE</option><option value="Febrero">FEB</option><option value="Marzo">MAR</option><option value="Abril">ABR</option><option value="Mayo">MAY</option><option value="Junio">JUN</option><option value="Julio">JUL</option><option value="Agosto">AGO</option><option value="Septiembre">SEP</option><option value="Octubre">OCT</option><option value="Noviembre">NOV</option><option value="Diciembre">DIC</option>
-                </select>
-                <input type="number">
-            </div>
-            <div class="input-group">
-                <select class="mes-select">
-                    <option value="Enero">ENE</option><option value="Febrero" selected>FEB</option><option value="Marzo">MAR</option><option value="Abril">ABR</option><option value="Mayo">MAY</option><option value="Junio">JUN</option><option value="Julio">JUL</option><option value="Agosto">AGO</option><option value="Septiembre">SEP</option><option value="Octubre">OCT</option><option value="Noviembre">NOV</option><option value="Diciembre">DIC</option>
-                </select>
-                <input type="number">
-            </div>
-            <div class="input-group">
-                <select class="mes-select">
-                    <option value="Enero">ENE</option><option value="Febrero">FEB</option><option value="Marzo" selected>MAR</option><option value="Abril">ABR</option><option value="Mayo">MAY</option><option value="Junio">JUN</option><option value="Julio">JUL</option><option value="Agosto">AGO</option><option value="Septiembre">SEP</option><option value="Octubre">OCT</option><option value="Noviembre">NOV</option><option value="Diciembre">DIC</option>
-                </select>
-                <input type="number">
-            </div>
-            <div class="input-group">
-                <select class="mes-select">
-                    <option value="Enero">ENE</option><option value="Febrero">FEB</option><option value="Marzo">MAR</option><option value="Abril" selected>ABR</option><option value="Mayo">MAY</option><option value="Junio">JUN</option><option value="Julio">JUL</option><option value="Agosto">AGO</option><option value="Septiembre">SEP</option><option value="Octubre">OCT</option><option value="Noviembre">NOV</option><option value="Diciembre">DIC</option>
-                </select>
-                <input type="number">
-            </div>
-            <div class="input-group">
-                <select class="mes-select">
-                    <option value="Enero">ENE</option><option value="Febrero">FEB</option><option value="Marzo">MAR</option><option value="Abril">ABR</option><option value="Mayo" selected>MAY</option><option value="Junio">JUN</option><option value="Julio">JUL</option><option value="Agosto">AGO</option><option value="Septiembre">SEP</option><option value="Octubre">OCT</option><option value="Noviembre">NOV</option><option value="Diciembre">DIC</option>
-                </select>
-                <input type="number">
-            </div>
-            <div class="input-group">
-                <select class="mes-select">
-                    <option value="Enero">ENE</option><option value="Febrero">FEB</option><option value="Marzo">MAR</option><option value="Abril">ABR</option><option value="Mayo">MAYO</option><option value="Junio" selected>JUN</option><option value="Julio">JUL</option><option value="Agosto">AGO</option><option value="Septiembre">SEP</option><option value="Octubre">OCT</option><option value="Noviembre">NOV</option><option value="Diciembre">DIC</option>
-                </select>
-                <input type="number">
-            </div>
+        <div class="section-title">Configuración de Datos</div>
+        
+        <!-- Menú para elegir cuántas columnas/meses crear -->
+        <div class="selector-columnas">
+            <label for="num-columnas">¿Cuántos periodos/meses deseas mostrar?</label>
+            <select id="num-columnas" onchange="generarCamposDinamicos()">
+                <option value="1">1 mes</option>
+                <option value="2">2 meses</option>
+                <option value="3">3 meses</option>
+                <option value="4">4 meses</option>
+                <option value="5">5 meses</option>
+                <option value="6" selected>6 meses</option>
+                <option value="7">7 meses</option>
+                <option value="8">8 meses</option>
+                <option value="9">9 meses</option>
+                <option value="10">10 meses</option>
+                <option value="11">11 meses</option>
+                <option value="12">12 meses</option>
+            </select>
         </div>
 
-        <div class="section-title">2. Montos Recuperados ($) para los mismos meses</div>
-        <div class="grid-inputs" id="inputs-plata">
-            <div class="input-group"><label class="sub-label">Monto 1</label><input type="number"></div>
-            <div class="input-group"><label class="sub-label">Monto 2</label><input type="number"></div>
-            <div class="input-group"><label class="sub-label">Monto 3</label><input type="number"></div>
-            <div class="input-group"><label class="sub-label">Monto 4</label><input type="number"></div>
-            <div class="input-group"><label class="sub-label">Monto 5</label><input type="number"></div>
-            <div class="input-group"><label class="sub-label">Monto 6</label><input type="number"></div>
+        <div style="font-size: 11px; font-weight: bold; color: #4a5568; margin-bottom: 5px;">
+            Ingresa libremente el nombre del mes/etiqueta, su cantidad y el monto:
         </div>
+
+        <!-- Contenedor dinámico de los inputs generados por JS -->
+        <div id="dinamic-inputs-container"></div>
 
         <div class="btn-update-container">
-            <button class="btn-update" onclick="renderizar()">Aplicar Cambios</button>
+            <button class="btn-update" onclick="renderizar()">Generar / Actualizar Gráfico</button>
         </div>
     </div>
 
+    <!-- Pestañas de Navegación -->
     <div class="tabs-container">
         <button id="tab-cant" class="tab-btn active" onclick="cambiarModo(false)">Vista: Cantidad de Procedimientos</button>
         <button id="tab-plata" class="tab-btn" onclick="cambiarModo(true)">Vista: Dinero ($)</button>
     </div>
 
+    <!-- Reporte Final y Gráfico -->
     <div id="reporte-final">
         <div class="header-reporte">
             <h2>REPORTE MENSUAL DE SEGURIDAD</h2>
@@ -97,11 +68,6 @@
             <div id="chart-container"></div>
         </div>
 
-        <!-- Botón personalizado para descargar el gráfico -->
-        <div class="btn-update-container" style="margin-top: 15px;">
-            <button class="btn-update" onclick="descargarGrafico()">Descargar Gráfico como Imagen</button>
-        </div>
-
         <div class="info-complementaria">
             <h3>Información Complementaria de Gestión:</h3>
             <ul id="lista-resumen"></ul>
@@ -109,7 +75,7 @@
     </div>
 </div>
 
-<!-- Enlace al archivo JS externo -->
+<!-- Enlace al archivo JavaScript externo (si lo guardas separado) -->
 <script src="script.js"></script>
 
 </body>

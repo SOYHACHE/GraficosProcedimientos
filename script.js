@@ -1,15 +1,5 @@
 let modoDinero = false;
 
-// Datos predeterminados iniciales para los 6 meses de ejemplo
-const datosPorDefecto = [
-    { mes: "Enero", cant: 4, plata: 53619 },
-    { mes: "Febrero", cant: 9, plata: 210259 },
-    { mes: "Marzo", cant: 8, plata: 143930 },
-    { mes: "Abril", cant: 5, plata: 151141 },
-    { mes: "Mayo", cant: 11, plata: 281616 },
-    { mes: "Junio", cant: 13, plata: 507862 }
-];
-
 function generarCamposDinamicos() {
     const cantidad = parseInt(document.getElementById('num-columnas').value);
     const container = document.getElementById('dinamic-inputs-container');
@@ -28,9 +18,10 @@ function generarCamposDinamicos() {
     container.innerHTML = '';
 
     for (let i = 0; i < cantidad; i++) {
-        let defMes = valoresPrevios[i] ? valoresPrevios[i].mes : (datosPorDefecto[i] ? datosPorDefecto[i].mes : `Mes ${i+1}`);
-        let defCant = valoresPrevios[i] ? valoresPrevios[i].cant : (datosPorDefecto[i] ? datosPorDefecto[i].cant : '');
-        let defPlata = valoresPrevios[i] ? valoresPrevios[i].plata : (datosPorDefecto[i] ? datosPorDefecto[i].plata : '');
+        // Si no hay valores previos, se dejan totalmente vacíos
+        let defMes = valoresPrevios[i] ? valoresPrevios[i].mes : '';
+        let defCant = valoresPrevios[i] ? valoresPrevios[i].cant : '';
+        let defPlata = valoresPrevios[i] ? valoresPrevios[i].plata : '';
 
         let row = document.createElement('div');
         row.className = 'columna-row';
@@ -177,4 +168,3 @@ function renderizar() {
 window.onload = function() {
     generarCamposDinamicos();
 };
-        

@@ -1,46 +1,3 @@
-let modoDinero = false;
-
-function cambiarModo(mostrarDinero) {
-    modoDinero = mostrarDinero;
-    document.getElementById('tab-cant').classList.toggle('active', !modoDinero);
-    document.getElementById('tab-plata').classList.toggle('active', modoDinero);
-    renderizar();
-}
-
-function formatearDinero(valor) {
-    return '$' + valor.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function actualizarTextoResumen(meses, dataCant, dataPlata) {
-    const lista = document.getElementById('lista-resumen');
-    lista.innerHTML = ''; 
-
-    if (meses.length === 0) {
-        lista.innerHTML = '<li>No hay datos ingresados para mostrar en este reporte.</li>';
-        return;
-    }
-
-    const totalCant = dataCant.reduce((a, b) => a + b, 0);
-    const maxCant = dataCant.length > 0 ? Math.max(...dataCant) : 0;
-    const mesMaxCant = meses[dataCant.indexOf(maxCant)] || 'N/A';
-
-    const totalPlata = dataPlata.reduce((a, b) => a + b, 0);
-    const maxPlata = dataPlata.length > 0 ? Math.max(...dataPlata) : 0;
-    const mesMaxPlata = meses[dataPlata.indexOf(maxPlata)] || 'N/A';
-    
-    const promedioCant = dataCant.length > 0 ? (totalCant / dataCant.length).toFixed(1) : 0;
-
-    if (!modoDinero) {
-        lista.innerHTML += `<li>Total acumulado del periodo visible: <b>${totalCant} procedimientos</b> realizados.</li>`;
-        lista.innerHTML += `<li>Promedio de rendimiento: <b>${promedioCant} intervenciones</b> por mes cargado.</li>`;
-        lista.innerHTML += `<li>Pico más alto registrado: <b>${maxCant} procedimientos</b> en el mes de ${mesMaxCant}.</li>`;
-    } else {
-        lista.innerHTML += `<li>Total acumulado del periodo visible: ${totalCant} procedimientos y <b>${formatearDinero(totalPlata)} recuperados</b>.</li>`;
-        lista.innerHTML += `<li>Pico más alto registrado en ${mesMaxPlata}: <b>${formatearDinero(maxPlata)}</b> (${maxCant} procedimientos).</li>`;
-        lista.innerHTML += `<li>Se mantiene un flujo de recuperación monetaria durante las fechas seleccionadas.</li>`;
-    }
-}
-
 function renderizar() {
     const selectsMeses = document.querySelectorAll('.mes-select');
     const inputsC = document.querySelectorAll('#inputs-cant input');
@@ -54,7 +11,7 @@ function renderizar() {
         let valC = inputsC[i].value.trim();
         let valP = inputsP[i].value.trim();
 
-        // CONDICIÓN: Si ambos campos (cantidad y dinero) están vacíos, omitimos este mes por completo
+        // Si ambos campos están vacíos, omitimos este mes
         if (valC === '' && valP === '') {
             continue;
         }
@@ -64,11 +21,18 @@ function renderizar() {
         dataPlata.push(valP === '' ? 0 : parseInt(valP));
     }
 
+    // Si el usuario borró todo y no hay meses, ponemos una categoría por defecto para que Highcharts no crashee
+    if (meses.length === 0) {
+        meses = ['Sin datos'];
+        dataCant = [0];
+        dataPlata = [0];
+    }
+
     const titulo = modoDinero ? "MONTOS RECUPERADOS ($)" : "CANTIDAD DE PROCEDIMIENTOS";
     const colorBarra = modoDinero ? '#2c5282' : '#1a365d';
     const dataActiva = modoDinero ? dataPlata : dataCant;
 
-    actualizarTextoResumen(meses, dataCant, dataPlata);
+    actualizarTextoResumen(meses.includes('Sin datos') ? [] : meses, dataCant, dataPlata);
 
     Highcharts.chart('chart-container', {
         chart: {
@@ -84,7 +48,7 @@ function renderizar() {
         },
         title: { text: titulo, style: { fontWeight: 'bold', color: '#000', fontSize: '15px' } },
         xAxis: {
-            categories: meses, // Solo contendrá los meses que tienen datos
+            categories: meses,
             labels: { style: { fontSize: '11px', fontWeight: 'bold', color: '#333' } },
             gridLineWidth: 1,
             gridLineColor: '#cbd5e0',
@@ -134,27 +98,3 @@ function renderizar() {
     });
 }
 
-// Función para descargar el gráfico actual
-function descargarGrafico() {
-    const chart = Highcharts.charts.find(c => c && c.renderTo.id === 'chart-container');
-    if (chart) {
-        chart.exportChart({
-            type: 'image/png',
-            filename: modoDinero ? 'reporte-recuperacion-dinero' : 'reporte-cantidad-procedimientos'
-        });
-    } else {
-        alert('El gráfico no está disponible para descargar.');
-    }
-}
-
-// Inicialización de la aplicación al cargar la página
-window.onload = renderizar;
-
-// Registro del Service Worker para funcionamiento PWA
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
-            .catch(err => console.log('Error al registrar el Service Worker:', err));
-    });
-}

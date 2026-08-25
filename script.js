@@ -124,6 +124,19 @@ function renderizar() {
     });
 }
 
+// Función para descargar el gráfico actual mediante el botón personalizado
+function descargarGrafico() {
+    const chart = Highcharts.charts.find(c => c && c.renderTo.id === 'chart-container');
+    if (chart) {
+        chart.exportChart({
+            type: 'image/png',
+            filename: modoDinero ? 'reporte-recuperacion-dinero' : 'reporte-cantidad-procedimientos'
+        });
+    } else {
+        alert('El gráfico no está disponible para descargar.');
+    }
+}
+
 // Inicialización de la aplicación
 window.onload = renderizar;
 
@@ -134,5 +147,5 @@ if ('serviceWorker' in navigator) {
             .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
             .catch(err => console.log('Error al registrar el Service Worker:', err));
     });
-          }
+}
 

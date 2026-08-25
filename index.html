@@ -12,9 +12,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Dashboard Seg">
 
-    <!-- Highcharts y componentes 3D -->
+    <!-- Highcharts, componentes 3D y módulo de exportación -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
 
     <!-- Enlace al archivo CSS externo -->
     <link rel="stylesheet" href="styles.css">
@@ -93,6 +94,11 @@
         
         <div class="chart-wrapper">
             <div id="chart-container"></div>
+        </div>
+
+        <!-- Botón personalizado para descargar el gráfico -->
+        <div class="btn-update-container" style="margin-top: 15px;">
+            <button class="btn-update" onclick="descargarGrafico()">Descargar Gráfico como Imagen</button>
         </div>
 
         <div class="info-complementaria">

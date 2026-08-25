@@ -1,49 +1,121 @@
-function renderizar() {
-    // Seleccionamos de forma segura todos los selects y los inputs de ambas secciones
-    const selectsMeses = document.querySelectorAll('.mes-select');
-    const inputsC = document.querySelectorAll('#inputs-cant input');
-    const inputsP = document.querySelectorAll('#inputs-plata input');
+let modoDinero = false;
+
+// Datos predeterminados iniciales para los 6 meses de ejemplo
+const datosPorDefecto = [
+    { mes: "Enero", cant: 4, plata: 53619 },
+    { mes: "Febrero", cant: 9, plata: 210259 },
+    { mes: "Marzo", cant: 8, plata: 143930 },
+    { mes: "Abril", cant: 5, plata: 151141 },
+    { mes: "Mayo", cant: 11, plata: 281616 },
+    { mes: "Junio", cant: 13, plata: 507862 }
+];
+
+function generarCamposDinamicos() {
+    const cantidad = parseInt(document.getElementById('num-columnas').value);
+    const container = document.getElementById('dinamic-inputs-container');
     
+    // Guardar valores actuales antes de redibujar (si ya existían)
+    const filasActuales = container.querySelectorAll('.columna-row');
+    let valoresPrevios = [];
+    filasActuales.forEach((fila) => {
+        valoresPrevios.push({
+            mes: fila.querySelector('.input-mes').value,
+            cant: fila.querySelector('.input-cant').value,
+            plata: fila.querySelector('.input-plata').value
+        });
+    });
+
+    container.innerHTML = '';
+
+    for (let i = 0; i < cantidad; i++) {
+        let defMes = valoresPrevios[i] ? valoresPrevios[i].mes : (datosPorDefecto[i] ? datosPorDefecto[i].mes : `Mes ${i+1}`);
+        let defCant = valoresPrevios[i] ? valoresPrevios[i].cant : (datosPorDefecto[i] ? datosPorDefecto[i].cant : '');
+        let defPlata = valoresPrevios[i] ? valoresPrevios[i].plata : (datosPorDefecto[i] ? datosPorDefecto[i].plata : '');
+
+        let row = document.createElement('div');
+        row.className = 'columna-row';
+        row.innerHTML = `
+            <div class="input-group">
+                <label>Nombre Periodo ${i+1}</label>
+                <input type="text" class="input-mes" value="${defMes}" placeholder="Ej: Enero">
+            </div>
+            <div class="input-group">
+                <label>Cantidad</label>
+                <input type="number" class="input-cant" value="${defCant}" placeholder="0">
+            </div>
+            <div class="input-group">
+                <label>Monto ($)</label>
+                <input type="number" class="input-plata" value="${defPlata}" placeholder="0">
+            </div>
+        `;
+        container.appendChild(row);
+    }
+    
+    renderizar();
+}
+
+function cambiarModo(mostrarDinero) {
+    modoDinero = mostrarDinero;
+    document.getElementById('tab-cant').classList.toggle('active', !modoDinero);
+    document.getElementById('tab-plata').classList.toggle('active', modoDinero);
+    renderizar();
+}
+
+function formatearDinero(valor) {
+    return '$' + valor.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function actualizarTextoResumen(meses, dataCant, dataPlata) {
+    const lista = document.getElementById('lista-resumen');
+    lista.innerHTML = ''; 
+
+    if (meses.length === 0) {
+        lista.innerHTML = '<li>No hay datos ingresados para mostrar en este reporte.</li>';
+        return;
+    }
+
+    const totalCant = dataCant.reduce((a, b) => a + b, 0);
+    const maxCant = Math.max(...dataCant);
+    const mesMaxCant = meses[dataCant.indexOf(maxCant)] || 'N/A';
+
+    const totalPlata = dataPlata.reduce((a, b) => a + b, 0);
+    const maxPlata = Math.max(...dataPlata);
+    const mesMaxPlata = meses[dataPlata.indexOf(maxPlata)] || 'N/A';
+    
+    const promedioCant = (totalCant / dataCant.length).toFixed(1);
+
+    if (!modoDinero) {
+        lista.innerHTML += `<li>Total acumulado del periodo: <b>${totalCant} procedimientos</b> realizados en ${meses.length} periodos.</li>`;
+        lista.innerHTML += `<li>Promedio de rendimiento mensual: <b>${promedioCant} intervenciones</b>.</li>`;
+        lista.innerHTML += `<li>Pico más alto registrado: <b>${maxCant} procedimientos</b> en ${mesMaxCant}.</li>`;
+    } else {
+        lista.innerHTML += `<li>Total acumulado del periodo: ${totalCant} procedimientos y <b>${formatearDinero(totalPlata)} recuperados</b>.</li>`;
+        lista.innerHTML += `<li>Pico más alto de dinero en ${mesMaxPlata}: <b>${formatearDinero(maxPlata)}</b> (${maxCant} procedimientos).</li>`;
+        lista.innerHTML += `<li>Se mantiene el flujo de recuperación monetaria registrado en los campos activos.</li>`;
+    }
+}
+
+function renderizar() {
+    const filas = document.querySelectorAll('.columna-row');
     let meses = [];
     let dataCant = [];
     let dataPlata = [];
 
-    for (let i = 0; i < 6; i++) {
-        // Aseguramos que existan los elementos antes de leerlos
-        if (!inputsC[i] || !inputsP[i]) continue;
+    filas.forEach(fila => {
+        let mesTxt = fila.querySelector('.input-mes').value.trim() || 'Sin Nombre';
+        let valC = parseFloat(fila.querySelector('.input-cant').value) || 0;
+        let valP = parseFloat(fila.querySelector('.input-plata').value) || 0;
 
-        let valC = inputsC[i].value.trim();
-        let valP = inputsP[i].value.trim();
-
-        // Si ambos campos están vacíos, omitimos este mes del gráfico
-        if (valC === '' && valP === '') {
-            continue;
-        }
-
-        meses.push(selectsMeses[i].value);
-        dataCant.push(valC === '' ? 0 : parseInt(valC));
-        dataPlata.push(valP === '' ? 0 : parseInt(valP));
-    }
-
-    // Si no hay ningún dato cargado en absoluto, ponemos un estado por defecto para que Highcharts no falle
-    if (meses.length === 0) {
-        meses = ['Ingrese datos'];
-        dataCant = [0];
-        dataPlata = [0];
-    }
+        meses.push(mesTxt);
+        dataCant.push(valC);
+        dataPlata.push(valP);
+    });
 
     const titulo = modoDinero ? "MONTOS RECUPERADOS ($)" : "CANTIDAD DE PROCEDIMIENTOS";
     const colorBarra = modoDinero ? '#2c5282' : '#1a365d';
     const dataActiva = modoDinero ? dataPlata : dataCant;
 
-    actualizarTextoResumen(meses.includes('Ingrese datos') ? [] : meses, dataCant, dataPlata);
-
-    // Verificamos que el contenedor del gráfico exista antes de renderizar
-    const contenedorGrafico = document.getElementById('chart-container');
-    if (!contenedorGrafico) {
-        console.error("No se encontró el contenedor 'chart-container' en el HTML.");
-        return;
-    }
+    actualizarTextoResumen(meses, dataCant, dataPlata);
 
     Highcharts.chart('chart-container', {
         chart: {
@@ -60,11 +132,7 @@ function renderizar() {
         title: { text: titulo, style: { fontWeight: 'bold', color: '#000', fontSize: '15px' } },
         xAxis: {
             categories: meses,
-            labels: { style: { fontSize: '11px', fontWeight: 'bold', color: '#333' } },
-            gridLineWidth: 1,
-            gridLineColor: '#cbd5e0',
-            lineColor: '#a0aec0',
-            lineWidth: 1
+            labels: { style: { fontSize: '11px', fontWeight: 'bold', color: '#333' } }
         },
         yAxis: {
             title: { 
@@ -73,10 +141,6 @@ function renderizar() {
             },
             allowDecimals: false,
             tickInterval: modoDinero ? null : 1,
-            gridLineWidth: 1,
-            gridLineColor: '#e2e8f0',
-            lineColor: '#a0aec0',
-            lineWidth: 1,
             labels: {
                 style: { fontSize: '10px' },
                 formatter: function() {
@@ -108,3 +172,9 @@ function renderizar() {
         }]
     });
 }
+
+// Inicializar al cargar la página
+window.onload = function() {
+    generarCamposDinamicos();
+};
+        

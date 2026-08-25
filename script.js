@@ -1,46 +1,3 @@
-let modoDinero = false;
-
-function cambiarModo(mostrarDinero) {
-    modoDinero = mostrarDinero;
-    document.getElementById('tab-cant').classList.toggle('active', !modoDinero);
-    document.getElementById('tab-plata').classList.toggle('active', modoDinero);
-    renderizar();
-}
-
-function formatearDinero(valor) {
-    return '$' + valor.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function actualizarTextoResumen(meses, dataCant, dataPlata) {
-    const lista = document.getElementById('lista-resumen');
-    lista.innerHTML = ''; 
-
-    if (meses.length === 0) {
-        lista.innerHTML = '<li>No hay datos ingresados para mostrar en este reporte.</li>';
-        return;
-    }
-
-    const totalCant = dataCant.reduce((a, b) => a + b, 0);
-    const maxCant = dataCant.length > 0 ? Math.max(...dataCant) : 0;
-    const mesMaxCant = meses[dataCant.indexOf(maxCant)] || 'N/A';
-
-    const totalPlata = dataPlata.reduce((a, b) => a + b, 0);
-    const maxPlata = dataPlata.length > 0 ? Math.max(...dataPlata) : 0;
-    const mesMaxPlata = meses[dataPlata.indexOf(maxPlata)] || 'N/A';
-    
-    const promedioCant = dataCant.length > 0 ? (totalCant / dataCant.length).toFixed(1) : 0;
-
-    if (!modoDinero) {
-        lista.innerHTML += `<li>Total acumulado del periodo visible: <b>${totalCant} procedimientos</b> realizados.</li>`;
-        lista.innerHTML += `<li>Promedio de rendimiento: <b>${promedioCant} intervenciones</b> por mes cargado.</li>`;
-        lista.innerHTML += `<li>Pico más alto registrado: <b>${maxCant} procedimientos</b> en el mes de ${mesMaxCant}.</li>`;
-    } else {
-        lista.innerHTML += `<li>Total acumulado del periodo visible: ${totalCant} procedimientos y <b>${formatearDinero(totalPlata)} recuperados</b>.</li>`;
-        lista.innerHTML += `<li>Pico más alto registrado en ${mesMaxPlata}: <b>${formatearDinero(maxPlata)}</b> (${maxCant} procedimientos).</li>`;
-        lista.innerHTML += `<li>Se mantiene un flujo de recuperación monetaria durante las fechas seleccionadas.</li>`;
-    }
-}
-
 function renderizar() {
     const selectsMeses = document.querySelectorAll('.mes-select');
     const inputsC = document.querySelectorAll('#inputs-cant input');
@@ -54,7 +11,6 @@ function renderizar() {
         let valC = inputsC[i].value.trim();
         let valP = inputsP[i].value.trim();
 
-        // Si ambos campos están vacíos, omitimos este mes del gráfico
         if (valC === '' && valP === '') continue;
 
         meses.push(selectsMeses[i].value);
@@ -83,7 +39,12 @@ function renderizar() {
         title: { text: titulo, style: { fontWeight: 'bold', color: '#000', fontSize: '15px' } },
         xAxis: {
             categories: meses,
-            labels: { style: { fontSize: '11px', fontWeight: 'bold', color: '#333' } }
+            labels: { style: { fontSize: '11px', fontWeight: 'bold', color: '#333' } },
+            // Líneas verticales para separar cada sector / mes
+            gridLineWidth: 1,
+            gridLineColor: '#cbd5e0',
+            lineColor: '#a0aec0',
+            lineWidth: 1
         },
         yAxis: {
             title: { 
@@ -92,6 +53,11 @@ function renderizar() {
             },
             allowDecimals: false,
             tickInterval: modoDinero ? null : 1,
+            // Líneas horizontales de la cuadrícula y marcado del eje Y
+            gridLineWidth: 1,
+            gridLineColor: '#e2e8f0',
+            lineColor: '#a0aec0',
+            lineWidth: 1,
             labels: {
                 style: { fontSize: '10px' },
                 formatter: function() {
@@ -122,29 +88,4 @@ function renderizar() {
             showInLegend: false
         }]
     });
-}
-
-// Función para descargar el gráfico actual
-function descargarGrafico() {
-    const chart = Highcharts.charts.find(c => c && c.renderTo.id === 'chart-container');
-    if (chart) {
-        chart.exportChart({
-            type: 'image/png',
-            filename: modoDinero ? 'reporte-recuperacion-dinero' : 'reporte-cantidad-procedimientos'
-        });
-    } else {
-        alert('El gráfico no está disponible para descargar.');
-    }
-}
-
-// Inicialización de la aplicación al cargar la página
-window.onload = renderizar;
-
-// Registro del Service Worker para funcionamiento PWA
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
-            .catch(err => console.log('Error al registrar el Service Worker:', err));
-    });
-}
+                }

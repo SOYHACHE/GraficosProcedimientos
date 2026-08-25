@@ -54,10 +54,12 @@ function renderizar() {
         let valC = inputsC[i].value.trim();
         let valP = inputsP[i].value.trim();
 
-        // Tomamos siempre el mes seleccionado del desplegable
+        // CONDICIÓN: Si ambos campos (cantidad y dinero) están vacíos, omitimos este mes por completo
+        if (valC === '' && valP === '') {
+            continue;
+        }
+
         meses.push(selectsMeses[i].value);
-        
-        // Si el input está vacío, asignamos 0 para que el gráfico no falle al renderizar
         dataCant.push(valC === '' ? 0 : parseInt(valC));
         dataPlata.push(valP === '' ? 0 : parseInt(valP));
     }
@@ -82,7 +84,7 @@ function renderizar() {
         },
         title: { text: titulo, style: { fontWeight: 'bold', color: '#000', fontSize: '15px' } },
         xAxis: {
-            categories: meses,
+            categories: meses, // Solo contendrá los meses que tienen datos
             labels: { style: { fontSize: '11px', fontWeight: 'bold', color: '#333' } },
             gridLineWidth: 1,
             gridLineColor: '#cbd5e0',

@@ -5,12 +5,217 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Seguridad Dinámico</title>
     
-    <!-- Librerías de Highcharts -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-3d.js"></script>
 
-    <!-- Enlace a la hoja de estilos CSS -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary: #1a365d;
+            --accent: #2b6cb0;
+            --bg: #e2e8f0;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+        h1 { 
+            color: var(--primary); 
+            text-align: center; 
+            margin: 15px 0; 
+            font-size: 22px;
+        }
+        .card-config {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 5px 0 10px 0;
+            text-transform: uppercase;
+        }
+        .selector-columnas {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 15px;
+        }
+        .selector-columnas label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #334155;
+        }
+        .selector-columnas select {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e0;
+            font-weight: bold;
+            font-size: 14px;
+            background: white;
+        }
+        #dinamic-inputs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .columna-row {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 8px;
+            align-items: center;
+        }
+        @media (max-width: 500px) {
+            .columna-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+        }
+        .input-group { 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .input-group label { 
+            font-size: 10px; 
+            font-weight: bold; 
+            margin-bottom: 2px; 
+            color: #4a5568;
+            text-transform: uppercase;
+        }
+        .input-group input { 
+            padding: 6px; 
+            border: 1px solid #cbd5e0; 
+            border-radius: 6px; 
+            text-align: center;
+            font-weight: bold;
+            font-size: 13px;
+            background: white;
+            width: 100%;
+        }
+        .tabs-container {
+            display: flex;
+            width: 100%;
+            background: #cbd5e0;
+            border-radius: 8px 8px 0 0;
+            padding: 4px 4px 0 4px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            color: #4a5568;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+        }
+        #reporte-final {
+            background: white;
+            padding: 20px;
+            border-radius: 0 0 12px 12px;
+            border: 1px solid #cbd5e0;
+            border-top: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+        .header-reporte {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 10px;
+        }
+        .header-reporte h2 { margin: 0; font-size: 18px; text-transform: uppercase; color: #000; }
+        .header-reporte p { margin: 3px 0 0; font-size: 14px; color: #4a5568; font-weight: 600; }
+        .chart-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+        #chart-container {
+            height: 400px;
+            width: 100%;
+            min-width: 320px;
+        }
+        .info-complementaria {
+            margin-top: 20px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .info-complementaria h3 {
+            margin-top: 0;
+            font-size: 13px;
+            color: #1a365d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 6px;
+        }
+        .info-complementaria ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .info-complementaria li {
+            font-size: 13px;
+            color: #334155;
+            margin-bottom: 6px;
+            position: relative;
+            padding-left: 15px;
+            line-height: 1.4;
+        }
+        .info-complementaria li::before {
+            content: "•";
+            color: #1a365d;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        .btn-update-container {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .btn-update {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            max-width: 250px;
+        }
+    </style>
 </head>
 <body>
 
@@ -20,7 +225,6 @@
     <div class="card-config">
         <div class="section-title">Configuración de Datos</div>
         
-        <!-- Menú para elegir cuántas columnas/meses crear -->
         <div class="selector-columnas">
             <label for="num-columnas">¿Cuántos periodos deseas mostrar?</label>
             <select id="num-columnas" onchange="generarCamposDinamicos()">
@@ -43,7 +247,6 @@
             Ingresa libremente el nombre del periodo, su cantidad y el monto:
         </div>
 
-        <!-- Contenedor dinámico generado por JavaScript -->
         <div id="dinamic-inputs-container"></div>
 
         <div class="btn-update-container">
@@ -51,13 +254,11 @@
         </div>
     </div>
 
-    <!-- Pestañas de Navegación -->
     <div class="tabs-container">
         <button id="tab-cant" class="tab-btn active" onclick="cambiarModo(false)">Vista: Cantidad de Procedimientos</button>
         <button id="tab-plata" class="tab-btn" onclick="cambiarModo(true)">Vista: Dinero ($)</button>
     </div>
 
-    <!-- Reporte y Gráfico -->
     <div id="reporte-final">
         <div class="header-reporte">
             <h2>REPORTE MENSUAL DE SEGURIDAD</h2>
@@ -74,9 +275,175 @@
         </div>
     </div>
 </div>
+<script>
+    let modoDinero = false;
 
-<!-- Enlace al archivo de lógica JavaScript -->
-<script src="script.js"></script>
+    function generarCamposDinamicos() {
+        const cantidad = parseInt(document.getElementById('num-columnas').value);
+        const container = document.getElementById('dinamic-inputs-container');
+        
+        const filasActuales = container.querySelectorAll('.columna-row');
+        let valoresPrevios = [];
+        filasActuales.forEach((fila) => {
+            valoresPrevios.push({
+                mes: fila.querySelector('.input-mes').value,
+                cant: fila.querySelector('.input-cant').value,
+                plata: fila.querySelector('.input-plata').value
+            });
+        });
+
+        container.innerHTML = '';
+
+        for (let i = 0; i < cantidad; i++) {
+            let defMes = valoresPrevios[i] ? valoresPrevios[i].mes : '';
+            let defCant = valoresPrevios[i] ? valoresPrevios[i].cant : '';
+            let defPlata = valoresPrevios[i] ? valoresPrevios[i].plata : '';
+
+            let row = document.createElement('div');
+            row.className = 'columna-row';
+            row.innerHTML = `
+                <div class="input-group">
+                    <label>Nombre Periodo ${i+1}</label>
+                    <input type="text" class="input-mes" value="${defMes}" placeholder="Ej: Enero">
+                </div>
+                <div class="input-group">
+                    <label>Cantidad</label>
+                    <input type="number" class="input-cant" value="${defCant}" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>Monto ($)</label>
+                    <input type="number" class="input-plata" value="${defPlata}" placeholder="0">
+                </div>
+            `;
+            container.appendChild(row);
+        }
+        
+        renderizar();
+    }
+
+    function cambiarModo(mostrarDinero) {
+        modoDinero = mostrarDinero;
+        document.getElementById('tab-cant').classList.toggle('active', !modoDinero);
+        document.getElementById('tab-plata').classList.toggle('active', modoDinero);
+        renderizar();
+    }
+
+    function formatearDinero(valor) {
+        return '$' + valor.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function actualizarTextoResumen(meses, dataCant, dataPlata) {
+        const lista = document.getElementById('lista-resumen');
+        lista.innerHTML = ''; 
+
+        if (meses.length === 0) {
+            lista.innerHTML = '<li>No hay datos ingresados para mostrar en este reporte.</li>';
+            return;
+        }
+
+        const totalCant = dataCant.reduce((a, b) => a + b, 0);
+        const maxCant = Math.max(...dataCant);
+        const mesMaxCant = meses[dataCant.indexOf(maxCant)] || 'N/A';
+
+        const totalPlata = dataPlata.reduce((a, b) => a + b, 0);
+        const maxPlata = Math.max(...dataPlata);
+        const mesMaxPlata = meses[dataPlata.indexOf(maxPlata)] || 'N/A';
+        
+        const promedioCant = (totalCant / dataCant.length).toFixed(1);
+
+        if (!modoDinero) {
+            lista.innerHTML += `<li>Total acumulado del periodo: <b>${totalCant} procedimientos</b> realizados en ${meses.length} periodos.</li>`;
+            lista.innerHTML += `<li>Promedio de rendimiento mensual: <b>${promedioCant} intervenciones</b>.</li>`;
+            lista.innerHTML += `<li>Pico más alto registrado: <b>${maxCant} procedimientos</b> en ${mesMaxCant}.</li>`;
+        } else {
+            lista.innerHTML += `<li>Total acumulado del periodo: ${totalCant} procedimientos y <b>${formatearDinero(totalPlata)} recuperados</b>.</li>`;
+            lista.innerHTML += `<li>Pico más alto de dinero en ${mesMaxPlata}: <b>${formatearDinero(maxPlata)}</b> (${maxCant} procedimientos).</li>`;
+            lista.innerHTML += `<li>Se mantiene el flujo de recuperación monetaria registrado en los campos activos.</li>`;
+        }
+    }
+
+    function renderizar() {
+        const filas = document.querySelectorAll('.columna-row');
+        let meses = [];
+        let dataCant = [];
+        let dataPlata = [];
+
+        filas.forEach(fila => {
+            let mesTxt = fila.querySelector('.input-mes').value.trim() || 'Sin Nombre';
+            let valC = parseFloat(fila.querySelector('.input-cant').value) || 0;
+            let valP = parseFloat(fila.querySelector('.input-plata').value) || 0;
+
+            meses.push(mesTxt);
+            dataCant.push(valC);
+            dataPlata.push(valP);
+        });
+
+        const titulo = modoDinero ? "MONTOS RECUPERADOS ($)" : "CANTIDAD DE PROCEDIMIENTOS";
+        const colorBarra = modoDinero ? '#2c5282' : '#1a365d';
+        const dataActiva = modoDinero ? dataPlata : dataCant;
+
+        actualizarTextoResumen(meses, dataCant, dataPlata);
+
+        Highcharts.chart('chart-container', {
+            chart: {
+                type: 'column',
+                options3d: {
+                    enabled: true,
+                    alpha: 10,
+                    beta: 12,
+                    depth: 40,
+                    viewDistance: 25
+                },
+                backgroundColor: 'transparent'
+            },
+            title: { text: titulo, style: { fontWeight: 'bold', color: '#000', fontSize: '15px' } },
+            xAxis: {
+                categories: meses,
+                labels: { style: { fontSize: '11px', fontWeight: 'bold', color: '#333' } }
+            },
+            yAxis: {
+                title: { 
+                    text: modoDinero ? 'Monto en Pesos ($)' : 'Cantidad de Procedimientos',
+                    style: { fontWeight: 'bold', color: '#000', fontSize: '12px' }
+                },
+                allowDecimals: false,
+                tickInterval: modoDinero ? null : 1,
+                labels: {
+                    style: { fontSize: '10px' },
+                    formatter: function() {
+                        return modoDinero ? '$' + this.value.toLocaleString('es-AR') : this.value;
+                    }
+                }
+            },
+            tooltip: {
+                headerFormat: '<b>{point.key}</b><br>',
+                pointFormat: modoDinero ? 'Recuperado: \${point.y:,.2f}' : 'Procedimientos: {point.y}'
+            },
+            plotOptions: {
+                column: {
+                    depth: 35,
+                    color: colorBarra,
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function() {
+                            return modoDinero ? '$' + this.y.toLocaleString('es-AR') : this.y;
+                        },
+                        style: { fontSize: '11px', fontWeight: 'bold', color: '#000', textOutline: 'none' }
+                    }
+                }
+            },
+            series: [{
+                name: modoDinero ? 'Dinero' : 'Cantidad',
+                data: dataActiva,
+                showInLegend: false
+            }]
+        });
+    }
+
+    window.onload = function() {
+        generarCamposDinamicos();
+    };
+</script>
 
 </body>
 </html>
